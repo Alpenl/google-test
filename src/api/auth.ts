@@ -36,6 +36,7 @@ export const authApi = {
           avatar: string
           userType: string
         }
+        is_new_user?: boolean
       }
       msg: string
       code: number
@@ -44,5 +45,46 @@ export const authApi = {
       socialCode: code,
       socialState: state
     })
+  },
+
+  /**
+   * 发送邮箱验证码
+   * @param email 邮箱地址
+   * @param redirectUrl 邮件链接回跳地址（可选）
+   */
+  sendEmailCode: (email: string, redirectUrl?: string) => {
+    return http.post<{
+      data: { expiresIn: number }
+      msg: string
+      code: number
+    }>('/web/auth/sendEmailCode', {
+      email,
+      redirectUrl
+    })
+  },
+
+  /**
+   * 邮箱验证码登录（自动注册）
+   * @param email 邮箱地址
+   * @param code 验证码
+   */
+  emailLogin: (email: string, code: string) => {
+    return http.post<{
+      data: {
+        access_token: string
+        expire_in: number
+        is_new_user?: boolean
+        user: {
+          userId: number
+          username?: string
+          nickName?: string
+          email?: string
+          avatar?: string
+          userType?: string
+        }
+      }
+      msg: string
+      code: number
+    }>('/web/auth/emailLogin', { email, code })
   }
 }

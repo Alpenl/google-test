@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // 后端 API 基础地址
-export const API_BASE_URL = 'http://localhost:8000'
+export const API_BASE_URL = 'http://localhost:5504'
 
 // 创建 axios 实例
 export const http = axios.create({
@@ -11,6 +11,21 @@ export const http = axios.create({
     'Content-Type': 'application/json'
   }
 })
+
+// 请求拦截器 - 自动添加 token
+http.interceptors.request.use(
+  (config) => {
+    // 从 localStorage 获取 token
+    const token = localStorage.getItem('access_token')
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
 // 响应拦截器
 http.interceptors.response.use(
