@@ -1,5 +1,11 @@
 import { http } from './config'
 
+export interface ApiResponse<T> {
+  data: T
+  msg: string
+  code: number
+}
+
 /**
  * 认证相关 API
  */
@@ -15,7 +21,7 @@ export const authApi = {
     if (inviteCode) {
       url += `&inviteCode=${inviteCode}`
     }
-    return http.get<{ data: string; msg: string; code: number }>(url)
+    return http.get<ApiResponse<string>, ApiResponse<string>>(url)
   },
 
   /**
@@ -25,8 +31,8 @@ export const authApi = {
    * @param state 状态参数
    */
   socialLogin: (source: string, code: string, state: string) => {
-    return http.post<{
-      data: {
+    return http.post<
+      ApiResponse<{
         access_token: string
         user: {
           userId: number
@@ -37,10 +43,20 @@ export const authApi = {
           userType: string
         }
         is_new_user?: boolean
-      }
-      msg: string
-      code: number
-    }>('/web/auth/socialLogin', {
+      }>,
+      ApiResponse<{
+        access_token: string
+        user: {
+          userId: number
+          username: string
+          nickName: string
+          email: string
+          avatar: string
+          userType: string
+        }
+        is_new_user?: boolean
+      }>
+    >('/web/auth/socialLogin', {
       source,
       socialCode: code,
       socialState: state
@@ -53,24 +69,22 @@ export const authApi = {
    * @param redirectUrl 邮件链接回跳地址（可选）
    */
   sendEmailCode: (email: string, redirectUrl?: string) => {
-    return http.post<{
-      data: { expiresIn: number }
-      msg: string
-      code: number
-    }>('/web/auth/sendEmailCode', {
-      email,
-      redirectUrl
-    })
+    return http.post<ApiResponse<{ expiresIn: number }>, ApiResponse<{ expiresIn: number }>>(
+      '/web/auth/sendEmailCode',
+      {
+        email,
+        redirectUrl
+      }
+    )
   },
 
   /**
    * 邮箱验证码登录（自动注册）
-   * @param email 邮箱地址
-   * @param code 验证码
+   * @param payload 邮箱登录参数（验证码或密码至少填一个，验证码注册需邮箱）
    */
-  emailLogin: (email: string, code: string) => {
-    return http.post<{
-      data: {
+  emailLogin: (payload: { email: string; code?: string; password?: string }) => {
+    return http.post<
+      ApiResponse<{
         access_token: string
         expire_in: number
         is_new_user?: boolean
@@ -82,9 +96,34 @@ export const authApi = {
           avatar?: string
           userType?: string
         }
-      }
-      msg: string
-      code: number
-    }>('/web/auth/emailLogin', { email, code })
+      }>,
+      ApiResponse<{
+        access_token: string
+        expire_in: number
+        is_new_user?: boolean
+        user: {
+          userId: number
+          username?: string
+          nickName?: string
+          email?: string
+          avatar?: string
+          userType?: string
+        }
+      }>
+    >('/web/auth/emailLogin', payload)
+  },
+
+  /**
+   * 修改前台用户用户名/密码
+   */
+  updateCredential: (data: { userName?: string; oldPassword?: string; newPassword?: string }) => {
+    return http.post<ApiResponse<any>, ApiResponse<any>>('/web/auth/updateCredential', data)
+  },
+
+  /**
+   * 忘记密码 - 邮箱验证码重置
+   */
+  resetPassword: (data: { email: string; code: string; newPassword: string }) => {
+    return http.post<ApiResponse<any>, ApiResponse<any>>('/web/auth/resetPassword', data)
   }
 }
