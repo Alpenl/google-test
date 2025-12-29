@@ -24,6 +24,11 @@ const router = createRouter({
       component: () => import('../views/MotionTaskView.vue'),
     },
     {
+      path: '/motion-image3d',
+      name: 'motion-image3d',
+      component: () => import('../views/MotionImage3DView.vue'),
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: '/',
     },

@@ -98,6 +98,25 @@ const deleteAsset = async (id: number) => {
   }
 }
 
+// 查看详情
+const viewDetail = async (id: number) => {
+  try {
+    loading.value = true
+    const response = await motionAssetApi.detail(id)
+    if (response.code === 200) {
+      alert(JSON.stringify(response.data, null, 2))
+      message.value = '✅ 获取详情成功'
+    } else {
+      message.value = '❌ 获取详情失败：' + response.msg
+    }
+  } catch (error: any) {
+    console.error('获取详情失败:', error)
+    message.value = '❌ 获取详情失败：' + (error.message || error.toString())
+  } finally {
+    loading.value = false
+  }
+}
+
 // 获取任务类型文本
 const getTaskTypeText = (type: string) => {
   const map: any = { '1': '视频动捕', '2': '文本生成', '3': '模型渲染' }
@@ -182,6 +201,9 @@ onMounted(() => {
             <p><strong>创建时间:</strong> {{ asset.createTime }}</p>
           </div>
           <div class="asset-actions">
+            <button @click="viewDetail(asset.id)" :disabled="loading">
+              查看详情
+            </button>
             <button
               @click="updateVisibility(asset.id, asset.visibility === '1' ? '0' : '1')"
               :disabled="loading"
@@ -212,6 +234,11 @@ onMounted(() => {
             <p><strong>用户 ID:</strong> {{ asset.userId }}</p>
             <p><strong>创建时间:</strong> {{ asset.createTime }}</p>
           </div>
+          <div class="asset-actions">
+            <button @click="viewDetail(asset.id)" :disabled="loading">
+              查看详情
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -222,6 +249,7 @@ onMounted(() => {
       <ul>
         <li><code>GET /web/motion/asset/list</code> - 统一查询资产（未登录查公开，已登录查个人）</li>
         <li><code>GET /web/motion/asset/list?visibility=1</code> - 查询公开资产</li>
+        <li><code>GET /web/motion/asset/detail/{id}</code> - 查询资产详情</li>
         <li><code>PUT /web/motion/asset/updateVisibility/{id}/{visibility}</code> - 更新可见性（需登录）</li>
         <li><code>DELETE /web/motion/asset/delete/{id}</code> - 删除资产（需登录）</li>
       </ul>

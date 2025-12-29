@@ -22,6 +22,9 @@ const router = useRouter()
           <button @click="router.push('/motion-task')" :class="{ active: $route.path === '/motion-task' }">
             🎯 动作任务
           </button>
+          <button @click="router.push('/motion-image3d')" :class="{ active: $route.path === '/motion-image3d' }">
+            🖼️ 图片转3D
+          </button>
         </div>
       </div>
     </nav>

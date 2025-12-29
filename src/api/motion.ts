@@ -30,6 +30,68 @@ export const motionAssetApi = {
    */
   delete: (id: number) => {
     return http.delete<any>(`/web/motion/asset/delete/${id}`)
+  },
+
+  /**
+   * 获取资产详情
+   * @param id 资产ID
+   */
+  detail: (id: number) => {
+    return http.get<any>(`/web/motion/asset/detail/${id}`)
+  }
+}
+
+/**
+ * 预置动作相关 API
+ */
+export const motionPresetApi = {
+  /**
+   * 获取预置动作列表
+   */
+  list: (params: { pageNum: number; pageSize: number }) => {
+    return http.get<any>('/web/motion/preset/list', params)
+  },
+
+  /**
+   * 获取预置动作详情
+   */
+  detail: (id: number | string) => {
+    return http.get<any>(`/web/motion/preset/detail/${id}`)
+  },
+
+  /**
+   * 按类型获取预置动作
+   */
+  listByType: (taskType: string, params: { pageNum: number; pageSize: number }) => {
+    return http.get<any>(`/web/motion/preset/listByType/${taskType}`, params)
+  },
+
+  /**
+   * 获取热门预置动作
+   */
+  popular: (limit: number) => {
+    return http.get<any>('/web/motion/preset/popular', { limit })
+  },
+
+  /**
+   * 获取最新预置动作
+   */
+  latest: (limit: number) => {
+    return http.get<any>('/web/motion/preset/latest', { limit })
+  },
+
+  /**
+   * 按类型统计预置动作
+   */
+  statisticsByType: () => {
+    return http.get<any>('/web/motion/preset/statisticsByType')
+  },
+
+  /**
+   * 搜索预置动作
+   */
+  search: (keyword: string, params: { pageNum: number; pageSize: number }) => {
+    return http.get<any>('/web/motion/preset/search', { keyword, ...params })
   }
 }
 
@@ -78,5 +140,67 @@ export const motionTaskApi = {
    */
   status: (taskNo: string) => {
     return http.get<any>(`/web/motion/task/status/${taskNo}`)
+  }
+}
+
+/**
+ * 图片转3D任务创建参数
+ */
+export interface CreateImage3DTaskBo {
+  /** 输入图片 OSS ID (必填) */
+  imageOssId: number | string
+  /** 网格生成服务商 (hunyuan3d/rodin，可选) */
+  meshProvider?: string
+  /** 备注 */
+  remark?: string
+}
+
+/**
+ * 图片转3D任务相关 API
+ */
+export const motionImage3dApi = {
+  /**
+   * 提交图片转3D任务
+   * @param data 任务参数（imageOssId, meshProvider, remark 等）
+   */
+  submit: (data: CreateImage3DTaskBo) => {
+    return http.post<{ data: string; msg: string; code: number }>(
+      '/web/motion/image3d/submit',
+      data
+    )
+  },
+
+  /**
+   * 查询任务进度
+   * @param taskNo 任务编号
+   */
+  progress: (taskNo: string) => {
+    return http.get<any>(`/web/motion/image3d/progress/${taskNo}`)
+  },
+
+  /**
+   * 取消任务
+   * @param taskNo 任务编号
+   */
+  cancel: (taskNo: string) => {
+    return http.post<any>(`/web/motion/image3d/cancel/${taskNo}`)
+  },
+
+  /**
+   * 重试任务
+   * @param taskNo 任务编号
+   */
+  retry: (taskNo: string) => {
+    return http.post<{ data: string; msg: string; code: number }>(
+      `/web/motion/image3d/retry/${taskNo}`
+    )
+  },
+
+  /**
+   * 查询任务列表
+   * @param params 分页与筛选参数
+   */
+  pageTasks: (params: { pageNum: number; pageSize: number; status?: string }) => {
+    return http.get<any>('/web/motion/image3d/pageTasks', params)
   }
 }
